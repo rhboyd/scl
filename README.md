@@ -93,6 +93,10 @@ Parameters:
     Description: Name of the Project
     Type: String
     Default: scl-2019
+  CustomName:
+      Description: Name of the Project
+      Type: String
+      Default: richard
 Resources:
   ArtifactBucket:
     Type: AWS::S3::Bucket
@@ -100,7 +104,7 @@ Resources:
   BuildProjectRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub ${ProjectName}-CodeBuildRole
+      RoleName: !Sub ${ProjectName}-CodeBuildRole-${CustomName}
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -116,7 +120,7 @@ Resources:
     Type: AWS::IAM::Policy
     DependsOn: S3BucketPolicy
     Properties:
-      PolicyName: !Sub ${ProjectName}-CodeBuildPolicy
+      PolicyName: !Sub ${ProjectName}-CodeBuildPolicy-${CustomName}
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -158,7 +162,7 @@ Resources:
   PipeLineRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub ${ProjectName}-codepipeline-role
+      RoleName: !Sub ${ProjectName}-codepipeline-role-${CustomName}
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -174,7 +178,7 @@ Resources:
     Type: AWS::IAM::Policy
     DependsOn: S3BucketPolicy
     Properties:
-      PolicyName: !Sub ${ProjectName}-codepipeline-policy
+      PolicyName: !Sub ${ProjectName}-codepipeline-policy-${CustomName}
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -226,7 +230,7 @@ Resources:
   CfnDeployRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub ${ProjectName}-cfn-role
+      RoleName: !Sub ${ProjectName}-cfn-role-${CustomName}
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -241,7 +245,7 @@ Resources:
   CfnDeployPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: !Sub ${ProjectName}-cfn-policy
+      PolicyName: !Sub ${ProjectName}-cfn-policy-${CustomName}
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -299,9 +303,9 @@ Resources:
                 Version: "1"
                 Provider: CloudFormation
               Configuration:
-                ChangeSetName: sample-lambda-dev
+                ChangeSetName: !Sub sample-lambda-dev-${CustomName}
                 ActionMode: CHANGE_SET_REPLACE
-                StackName: sample-lambda-dev
+                StackName: !Sub sample-lambda-dev-${CustomName}
                 Capabilities: CAPABILITY_NAMED_IAM
                 RoleArn: !GetAtt CfnDeployRole.Arn
                 TemplatePath: BuildOutput::samtemplate.yaml
@@ -315,9 +319,9 @@ Resources:
                 Version: "1"
                 Provider: CloudFormation
               Configuration:
-                ChangeSetName: sample-lambda-dev
+                ChangeSetName: !Sub sample-lambda-dev-${CustomName}
                 ActionMode: CHANGE_SET_EXECUTE
-                StackName: sample-lambda-dev
+                StackName: !Sub sample-lambda-dev-${CustomName}
               InputArtifacts:
                 - Name: BuildOutput
               RunOrder: 2
