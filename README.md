@@ -130,7 +130,8 @@ Resources:
               - s3:PutObject
               - s3:GetObject
               - s3:GetObjectVersion
-            Resource: *
+              - codecommit:*
+            Resource: "*"
           -
             Effect: Allow
             Action:
@@ -294,7 +295,8 @@ Resources:
               - Name: SCCheckoutArtifact
             OutputArtifacts:
               - Name: BuildOutput
-        - Name: DeployToTest
+        -
+          Name: CreateChangeSet
           Actions:
             - Name: CreateChangeSetTest
               ActionTypeId:
@@ -312,6 +314,20 @@ Resources:
               InputArtifacts:
                 - Name: BuildOutput
               RunOrder: 1
+        -
+          Name: ManualApproval
+          Actions:
+            - Name: Approval
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Version: "1"
+                Provider: Manual
+              Configuration:
+                CustomData: Approve me.
+              RunOrder: 1
+        - Name: DeployChangeSet
+          Actions:
             - Name: DeployChangeSetTest
               ActionTypeId:
                 Category: Deploy
